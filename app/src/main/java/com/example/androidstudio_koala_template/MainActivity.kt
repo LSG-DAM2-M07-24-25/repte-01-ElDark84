@@ -18,11 +18,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Crear un LinearLayout vertical para organizar las vistas
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL // Colocar los elementos en columna
+        // Crear un FrameLayout principal para organizar las vistas
+        val mainLayout = FrameLayout(this).apply {
             setPadding(16, 16, 16, 16) // Opcional, para dar algo de espacio
-            gravity = Gravity.CENTER_HORIZONTAL // Centrar horizontalmente todos los elementos
+        }
+
+        // Crear un LinearLayout para el título y el botón
+        val topLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
         }
 
         // Crear el TextView con el título "Repte 01"
@@ -33,10 +41,21 @@ class MainActivity : ComponentActivity() {
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER // Centrar el texto
         }
 
-        // Crear el botón que activará el menú desplegable
+        // Crear el botón que activará el menú desplegable en la parte superior
         val button = Button(this).apply {
             text = "Tria un Icon"
             gravity = Gravity.CENTER
+        }
+
+        // Crear un LinearLayout secundario para centrar los demás elementos
+        val secondaryLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER // Centrar horizontalmente todos los elementos
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER // Centrar verticalmente el layout
+            )
         }
 
         // Crear los TextViews para Min y Max
@@ -67,12 +86,38 @@ class MainActivity : ComponentActivity() {
             gravity = Gravity.CENTER
         }
 
+        // Crear el RelativeLayout para la imagen y el número
+        val relativeLayout = RelativeLayout(this)
+
         // Crear el ImageView
         val imageView = ImageView(this).apply {
             setImageResource(R.drawable.like) // Actualiza con la ruta de tu imagen
             visibility = View.VISIBLE
-            layoutParams = LinearLayout.LayoutParams(200, 200) // Tamaño fijo de la imagen
+            layoutParams = RelativeLayout.LayoutParams(200, 200) // Tamaño fijo de la imagen
         }
+
+        // Crear el TextView para el número
+        val numberTextView = TextView(this).apply {
+            textSize = 24f
+            setTextColor(Color.RED)
+            id = View.generateViewId()
+        }
+
+        // Configurar el layout params del ImageView y el TextView
+        val imageViewParams = RelativeLayout.LayoutParams(200, 200).apply {
+            addRule(RelativeLayout.CENTER_IN_PARENT)
+        }
+        val numberTextViewParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            addRule(RelativeLayout.RIGHT_OF, imageView.id)
+            addRule(RelativeLayout.ALIGN_BASELINE, imageView.id)
+            marginStart = 16
+        }
+
+        // Añadir las vistas al RelativeLayout
+        relativeLayout.addView(imageView, imageViewParams)
+        relativeLayout.addView(numberTextView, numberTextViewParams)
 
         // Configurar el botón para mostrar el PopupMenu (DropdownMenu)
         button.setOnClickListener { view ->
@@ -117,28 +162,11 @@ class MainActivity : ComponentActivity() {
             popupMenu.show()
         }
 
-        // Función para agregar un número a la imagen
-        fun addNumberToImage(originalDrawable: Int, number: Int): BitmapDrawable {
-            val originalBitmap = (ContextCompat.getDrawable(this, originalDrawable) as BitmapDrawable).bitmap
-            val bitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true)
-            val canvas = Canvas(bitmap)
-            val paint = Paint().apply {
-                color = Color.RED
-                textSize = 40f
-                isAntiAlias = true
-            }
-            val text = number.toString()
-            val x = (bitmap.width * 0.5 - paint.measureText(text) * 0.5).toFloat()
-            val y = (bitmap.height * 0.5 + paint.textSize * 0.5).toFloat()
-            canvas.drawText(text, x, y, paint)
-            return BitmapDrawable(resources, bitmap)
-        }
-
-        // Acción del SeekBar para cambiar el número en la imagen
+        // Acción del SeekBar para cambiar el número al lado de la imagen
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                // Actualizar la imagen con el número
-                imageView.setImageDrawable(addNumberToImage(R.drawable.like, progress))
+                // Actualizar el número al lado de la imagen
+                numberTextView.text = progress.toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -150,9 +178,9 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        // Agregar las vistas al layout
-        layout.addView(textView)
-        layout.addView(button)
+        // Agregar el TextView y el botón al topLayout
+        topLayout.addView(textView)
+        topLayout.addView(button)
 
         // Añadir las vistas para Min y Max
         val minMaxLayout = LinearLayout(this).apply {
@@ -163,12 +191,17 @@ class MainActivity : ComponentActivity() {
         minMaxLayout.addView(maxTextView)
         minMaxLayout.addView(maxValueTextView)
 
-        layout.addView(minMaxLayout)
-        layout.addView(seekBar)
-        layout.addView(sendButton)
-        layout.addView(imageView)
+        // Agregar las vistas al secondaryLayout
+        secondaryLayout.addView(minMaxLayout)
+        secondaryLayout.addView(seekBar)
+        secondaryLayout.addView(sendButton)
+        secondaryLayout.addView(relativeLayout)
 
-        // Establecer el layout como la vista principal de la actividad
-        setContentView(layout)
+        // Añadir topLayout y secondaryLayout al mainLayout
+        mainLayout.addView(topLayout)
+        mainLayout.addView(secondaryLayout)
+
+        // Establecer el mainLayout como la vista principal de la actividad
+        setContentView(mainLayout)
     }
 }
