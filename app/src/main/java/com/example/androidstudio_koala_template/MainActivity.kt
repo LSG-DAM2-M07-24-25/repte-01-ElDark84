@@ -58,7 +58,19 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        // Crear los TextViews para Min y Max
+        // Crear los EditTexts para Min y Max
+        val minEditText = EditText(this).apply {
+            hint = "Min"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText("0") // Valor inicial
+        }
+        val maxEditText = EditText(this).apply {
+            hint = "Max"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText("10") // Valor inicial
+        }
+
+        // Crear los TextViews para mostrar los valores de Min y Max
         val minTextView = TextView(this).apply {
             text = "Min:"
         }
@@ -66,18 +78,10 @@ class MainActivity : ComponentActivity() {
             text = "Max:"
         }
 
-        // Crear los TextViews para mostrar los valores de Min y Max
-        val minValueTextView = TextView(this).apply {
-            text = "0"
-        }
-        val maxValueTextView = TextView(this).apply {
-            text = "10"
-        }
-
         // Crear el SeekBar
         val seekBar = SeekBar(this).apply {
             max = 10
-            progress = 3
+            progress = 0
         }
 
         // Crear el botón de enviar
@@ -178,6 +182,15 @@ class MainActivity : ComponentActivity() {
             }
         })
 
+        // Configurar el botón de enviar para actualizar el SeekBar
+        sendButton.setOnClickListener {
+            val min = minEditText.text.toString().toIntOrNull() ?: 0
+            val max = maxEditText.text.toString().toIntOrNull() ?: 10
+            seekBar.max = max
+            seekBar.progress = min
+            numberTextView.text = min.toString()
+        }
+
         // Agregar el TextView y el botón al topLayout
         topLayout.addView(textView)
         topLayout.addView(button)
@@ -187,9 +200,9 @@ class MainActivity : ComponentActivity() {
             orientation = LinearLayout.HORIZONTAL
         }
         minMaxLayout.addView(minTextView)
-        minMaxLayout.addView(minValueTextView)
+        minMaxLayout.addView(minEditText)
         minMaxLayout.addView(maxTextView)
-        minMaxLayout.addView(maxValueTextView)
+        minMaxLayout.addView(maxEditText)
 
         // Agregar las vistas al secondaryLayout
         secondaryLayout.addView(minMaxLayout)
