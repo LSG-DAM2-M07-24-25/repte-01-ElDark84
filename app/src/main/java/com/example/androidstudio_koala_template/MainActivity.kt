@@ -11,38 +11,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import android.graphics.Color
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.androidstudio_koala_template.ui.theme.AndroidStudioKoalaTemplateTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            AndroidStudioKoalaTemplateTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        // Crear un TextView programáticamente
+        val textView = TextView(this).apply {
+            text = "Repte 01"
+            textSize = 36f // tamaño del texto grande
+            setTextColor(Color.BLUE) // color del texto azul
+            textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true
-    , showSystemUi = true)
-@Composable
-fun GreetingPreview() {
-    AndroidStudioKoalaTemplateTheme {
-        Greeting("Android")
+        // Establecer el TextView como la vista principal de la actividad
+        setContentView(textView)
     }
 }
