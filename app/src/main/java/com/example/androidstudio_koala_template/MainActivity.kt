@@ -5,19 +5,25 @@ import androidx.activity.ComponentActivity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import android.view.View
+import android.view.ViewGroup.LayoutParams
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
+import android.view.Gravity
+import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Crear un LinearLayout vertical para organizar las vistas
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL // Colocar los elementos en columna
             setPadding(16, 16, 16, 16) // Opcional, para dar algo de espacio
+            gravity = Gravity.CENTER_HORIZONTAL // Centrar horizontalmente todos los elementos
         }
 
         // Crear el TextView con el título "Repte 01"
@@ -25,12 +31,48 @@ class MainActivity : ComponentActivity() {
             text = "Repte 01"
             textSize = 36f // tamaño del texto grande
             setTextColor(Color.BLUE) // color azul
-            textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START // alineado a la izquierda
+            textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START // Centrar el texto
         }
 
         // Crear el botón que activará el menú desplegable
         val button = Button(this).apply {
-            text = "Selecciona un icono"
+            text = "Tria un Icon"
+            gravity = Gravity.CENTER
+        }
+
+        // Crear los TextViews para Min y Max
+        val minTextView = TextView(this).apply {
+            text = "Min:"
+        }
+        val maxTextView = TextView(this).apply {
+            text = "Max:"
+        }
+
+        // Crear los TextViews para mostrar los valores de Min y Max
+        val minValueTextView = TextView(this).apply {
+            text = "0"
+        }
+        val maxValueTextView = TextView(this).apply {
+            text = "10"
+        }
+
+        // Crear el SeekBar
+        val seekBar = SeekBar(this).apply {
+            max = 10
+            progress = 3
+        }
+
+        // Crear el botón de enviar
+        val sendButton = Button(this).apply {
+            text = "Enviar"
+            gravity = Gravity.CENTER
+        }
+
+        // Crear el ImageView
+        val imageView = ImageView(this).apply {
+            setImageResource(R.drawable.like) // Actualiza con la ruta de tu imagen
+            visibility = View.VISIBLE
+            layoutParams = LayoutParams(100, 100) // Tamaño inicial de la imagen
         }
 
         // Configurar el botón para mostrar el PopupMenu (DropdownMenu)
@@ -76,13 +118,62 @@ class MainActivity : ComponentActivity() {
             popupMenu.show()
         }
 
-        // Agregar el TextView y el Button al layout
+        // Función para agregar un número a la imagen
+        fun addNumberToImage(originalDrawable: Int, number: Int): BitmapDrawable {
+            val originalBitmap = (ContextCompat.getDrawable(this, originalDrawable) as BitmapDrawable).bitmap
+            val bitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true)
+            val canvas = Canvas(bitmap)
+            val paint = Paint().apply {
+                color = Color.RED
+                textSize = 40f
+                isAntiAlias = true
+            }
+            val text = number.toString()
+            val x = (bitmap.width * 0.5 - paint.measureText(text) * 0.5).toFloat()
+            val y = (bitmap.height * 0.5 + paint.textSize * 0.5).toFloat()
+            canvas.drawText(text, x, y, paint)
+            return BitmapDrawable(resources, bitmap)
+        }
+
+        // Acción del SeekBar para cambiar el tamaño de la imagen y añadir el número
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val scale = 100 + progress * 10
+                imageView.layoutParams = LinearLayout.LayoutParams(scale, scale).apply {
+                    gravity = Gravity.CENTER // Centrar la imagen
+                }
+                // Actualizar la imagen con el número
+                imageView.setImageDrawable(addNumberToImage(R.drawable.like, progress))
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // No se necesita implementar
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // No se necesita implementar
+            }
+        })
+
+        // Agregar las vistas al layout
         layout.addView(textView)
         layout.addView(button)
+
+        // Añadir las vistas para Min y Max
+        val minMaxLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        minMaxLayout.addView(minTextView)
+        minMaxLayout.addView(minValueTextView)
+        minMaxLayout.addView(maxTextView)
+        minMaxLayout.addView(maxValueTextView)
+
+        layout.addView(minMaxLayout)
+        layout.addView(seekBar)
+        layout.addView(sendButton)
+        layout.addView(imageView)
 
         // Establecer el layout como la vista principal de la actividad
         setContentView(layout)
     }
 }
-
-
