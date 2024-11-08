@@ -7,7 +7,6 @@ import android.graphics.drawable.ColorDrawable
 import android.view.MenuItem
 import android.widget.*
 import android.view.View
-import android.view.ViewGroup.LayoutParams
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -31,7 +30,7 @@ class MainActivity : ComponentActivity() {
             text = "Repte 01"
             textSize = 36f // tamaño del texto grande
             setTextColor(Color.BLUE) // color azul
-            textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START // Centrar el texto
+            textAlignment = TextView.TEXT_ALIGNMENT_CENTER // Centrar el texto
         }
 
         // Crear el botón que activará el menú desplegable
@@ -72,7 +71,7 @@ class MainActivity : ComponentActivity() {
         val imageView = ImageView(this).apply {
             setImageResource(R.drawable.like) // Actualiza con la ruta de tu imagen
             visibility = View.VISIBLE
-            layoutParams = LayoutParams(100, 100) // Tamaño inicial de la imagen
+            layoutParams = LinearLayout.LayoutParams(200, 200) // Tamaño fijo de la imagen
         }
 
         // Configurar el botón para mostrar el PopupMenu (DropdownMenu)
@@ -135,13 +134,9 @@ class MainActivity : ComponentActivity() {
             return BitmapDrawable(resources, bitmap)
         }
 
-        // Acción del SeekBar para cambiar el tamaño de la imagen y añadir el número
+        // Acción del SeekBar para cambiar el número en la imagen
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val scale = 100 + progress * 10
-                imageView.layoutParams = LinearLayout.LayoutParams(scale, scale).apply {
-                    gravity = Gravity.CENTER // Centrar la imagen
-                }
                 // Actualizar la imagen con el número
                 imageView.setImageDrawable(addNumberToImage(R.drawable.like, progress))
             }
