@@ -2,25 +2,14 @@ package com.example.androidstudio_koala_template
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.example.androidstudio_koala_template.ui.theme.AndroidStudioKoalaTemplateTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +43,27 @@ class MainActivity : ComponentActivity() {
             menu.add("Llamar")
             menu.add("Email")
             menu.add("El resto de icono (Por defecto)")
+
+            // Personalizar el color de fondo del PopupMenu
+            try {
+                val fieldBackground = PopupMenu::class.java.getDeclaredField("mPopup")
+                fieldBackground.isAccessible = true
+                val popup = fieldBackground.get(popupMenu)
+
+                // Cambiar el fondo del menú
+                popup.javaClass.getDeclaredMethod("setBackgroundDrawable", android.graphics.drawable.Drawable::class.java)
+                    .invoke(popup, ColorDrawable(Color.BLUE))
+
+                // Cambiar el color de fondo de los items de menú
+                for (i in 0 until menu.size()) {
+                    val item = menu.getItem(i)
+                    // Cambiar el color del texto de los ítems usando reflexion para el menú
+                    val itemView = item.actionView
+                    itemView?.setBackgroundColor(Color.BLUE) // Fondo azul para los ítems
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
 
             // Manejar la selección de una opción
             popupMenu.setOnMenuItemClickListener { item: MenuItem ->
